@@ -9,36 +9,57 @@ spec:
   serviceName: postgres
   replicas: 1
   selector:
-    matchLabels: { app: postgres }
+    matchLabels:
+      app: postgres
   template:
     metadata:
-      labels: { app: postgres }
+      labels:
+        app: postgres
     spec:
-      securityContext: { fsGroup: 999 }
+      securityContext:
+        fsGroup: 999
       containers:
         - name: postgres
-          image: postgres:17
-          ports: [{ containerPort: 5432 }]
+          image: postgres:16    # bir major’a sabitle (15 veya 16 önerilir)
+          ports:
+            - containerPort: 5432
           env:
             - name: POSTGRES_DB
-              value: mydb
+              valueFrom:
+                secretKeyRef: { name: postgres-secret, key: POSTGRES_DB }
             - name: POSTGRES_USER
-              valueFrom: { secretKeyRef: { name: postgres-secret, key: POSTGRES_USER } }
+              valueFrom:
+                secretKeyRef: { name: postgres-secret, key: POSTGRES_USER }
             - name: POSTGRES_PASSWORD
-              valueFrom: { secretKeyRef: { name: postgres-secret, key: POSTGRES_PASSWORD } }
-          readinessProbe: { tcpSocket: { port: 5432 }, initialDelaySeconds: 5, periodSeconds: 5, timeoutSeconds: 2 }
-          livenessProbe:  { tcpSocket: { port: 5432 }, initialDelaySeconds: 30, periodSeconds: 10, timeoutSeconds: 2 }
+              valueFrom:
+                secretKeyRef: { name: postgres-secret, key: POSTGRES_PASSWORD }
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          livenessProbe:
+            tcpSocket: { port: 5432 }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+          readinessProbe:
+            tcpSocket: { port: 5432 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
           volumeMounts:
             - name: pgdata
               mountPath: /var/lib/postgresql/data
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
-          volumes:
-            - name: init-sql
-              configMap:
-                name: pg-init-sql
+      volumes:                   # <-- POD SPEC’TE (container dışında)
+        - name: init-sql
+          configMap:
+            name: pg-init-sql
   volumeClaimTemplates:
-    - metadata: { name: pgdata }
+    - metadata:
+        name: pgdata
       spec:
-        accessModes: ["ReadWriteOnce"]
-        resources: { requests: { storage: 5Gi } }
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: hostpath   # sende bu görünüyor
+        resources:
+          requests:
+            storage: 5Gi
