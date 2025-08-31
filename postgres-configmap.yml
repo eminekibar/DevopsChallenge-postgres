@@ -1,9 +1,23 @@
+# postgres-configmap.yml (data bölümüne ekle veya güncelle)
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: pg-init-sql
   namespace: devopschallenge
 data:
+  00_init.sql: |
+    DO $$ BEGIN
+      CREATE ROLE emine LOGIN PASSWORD 'emine';
+    EXCEPTION WHEN duplicate_object THEN
+      RAISE NOTICE 'role emine already exists';
+    END $$;
+
+    DO $$ BEGIN
+      CREATE DATABASE mydb OWNER emine;
+    EXCEPTION WHEN duplicate_database THEN
+      RAISE NOTICE 'db mydb already exists';
+    END $$;
+
   01_create_messages.sql: |
     CREATE TABLE IF NOT EXISTS messages(
       id SERIAL PRIMARY KEY,
