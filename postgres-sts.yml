@@ -28,7 +28,15 @@ spec:
               valueFrom: { secretKeyRef: { name: postgres-secret, key: POSTGRES_PASSWORD } }
           readinessProbe: { tcpSocket: { port: 5432 }, initialDelaySeconds: 5, periodSeconds: 5, timeoutSeconds: 2 }
           livenessProbe:  { tcpSocket: { port: 5432 }, initialDelaySeconds: 30, periodSeconds: 10, timeoutSeconds: 2 }
-          volumeMounts: [{ name: pgdata, mountPath: /var/lib/postgresql/data }]
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: init-sql
+              mountPath: /docker-entrypoint-initdb.d
+          volumes:
+            - name: init-sql
+              configMap:
+                name: pg-init-sql
   volumeClaimTemplates:
     - metadata: { name: pgdata }
       spec:
