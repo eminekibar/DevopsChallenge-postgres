@@ -18,21 +18,31 @@ spec:
     spec:
       securityContext:
         fsGroup: 999
+      volumes:
+        - name: init-sql
+          configMap:
+            name: pg-init-sql
       containers:
         - name: postgres
-          image: postgres:16    # bir major’a sabitle (15 veya 16 önerilir)
+          image: postgres:17
           ports:
             - containerPort: 5432
           env:
             - name: POSTGRES_DB
               valueFrom:
-                secretKeyRef: { name: postgres-secret, key: POSTGRES_DB }
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
             - name: POSTGRES_USER
               valueFrom:
-                secretKeyRef: { name: postgres-secret, key: POSTGRES_USER }
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
-                secretKeyRef: { name: postgres-secret, key: POSTGRES_PASSWORD }
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
           livenessProbe:
@@ -50,16 +60,14 @@ spec:
               mountPath: /var/lib/postgresql/data
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
-      volumes:                   # <-- POD SPEC’TE (container dışında)
-        - name: init-sql
-          configMap:
-            name: pg-init-sql
   volumeClaimTemplates:
     - metadata:
         name: pgdata
+        labels:
+          app: postgres
       spec:
-        accessModes: [ "ReadWriteOnce" ]
-        storageClassName: hostpath   # sende bu görünüyor
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: hostpath
         resources:
           requests:
             storage: 5Gi
