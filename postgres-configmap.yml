@@ -22,6 +22,6 @@ data:
     CREATE TABLE IF NOT EXISTS messages(
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
-      message TEXT NOT NULL,
+      text TEXT NOT NULL,
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
