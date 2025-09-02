@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-to-postgres
+  namespace: devopschallenge
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres          # hedef: postgres podları
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:       # aynı namespace’teki backend podları
+            matchLabels:
+              app: backend
+      ports:
+        - protocol: TCP
+          port: 5432
