@@ -6,14 +6,14 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: postgres          # hedef: postgres podları
+      app: backend
   policyTypes:
-    - Ingress
-  ingress:
-    - from:
-        - podSelector:       # aynı namespace’teki backend podları
-            matchLabels:
-              app: backend
-      ports:
-        - protocol: TCP
-          port: 5432
+  - Egress
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
