@@ -63,8 +63,6 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: pgdata
-        labels:
-          app: postgres
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: hostpath
