@@ -43,18 +43,20 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
-            - name: PGDATA2
-              value: /var/lib/postgresql/data/pgdata2
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           livenessProbe:
-            tcpSocket: { port: 5432 }
+            exec:
+              command: ["sh","-c","pg_isready -h 127.0.0.1 -p 5432"]
             initialDelaySeconds: 30
             periodSeconds: 10
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           readinessProbe:
-            tcpSocket: { port: 5432 }
+            exec:
+              command: ["sh","-c","pg_isready -h 127.0.0.1 -p 5432"]
             initialDelaySeconds: 5
             periodSeconds: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           volumeMounts:
             - name: pgdata2
               mountPath: /var/lib/postgresql/data
