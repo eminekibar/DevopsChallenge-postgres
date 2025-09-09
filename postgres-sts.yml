@@ -57,7 +57,7 @@ spec:
             timeoutSeconds: 2
           volumeMounts:
             - name: pgdata2
-              mountPath: /var/lib/postgresql/data2
+              mountPath: /var/lib/postgresql/data
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
   volumeClaimTemplates:
