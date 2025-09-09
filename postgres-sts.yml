@@ -6,9 +6,6 @@ metadata:
   labels:
     app: postgres
 spec:
-  persistentVolumeClaimRetentionPolicy:
-    whenDeleted: Retain
-    whenScaled: Retain
   podManagementPolicy: OrderedReady
   serviceName: postgres
   revisionHistoryLimit: 10
