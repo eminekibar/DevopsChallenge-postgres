@@ -12,11 +12,9 @@ data:
       RAISE NOTICE 'role emine already exists';
     END $$;
 
-    DO $$ BEGIN
-      CREATE DATABASE mydb OWNER emine;
-    EXCEPTION WHEN duplicate_database THEN
-      RAISE NOTICE 'db mydb already exists';
-    END $$;
+    -- Database 'mydb' is created by the official entrypoint when POSTGRES_DB is set.
+    -- Avoid CREATE DATABASE inside a transaction (forbidden by PostgreSQL) to prevent init errors.
+    -- If you ever need conditional DB creation in SQL, prefer psql's \gexec approach in a script run outside a DO block.
 
   01_create_messages.sql: |
     CREATE TABLE IF NOT EXISTS messages(
