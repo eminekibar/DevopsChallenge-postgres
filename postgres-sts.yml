@@ -43,8 +43,8 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
-            - name: pgdata2
-              value: /var/lib/postgresql/data/pgdata2
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           livenessProbe:
             tcpSocket: { port: 5432 }
             initialDelaySeconds: 30
@@ -56,13 +56,13 @@ spec:
             periodSeconds: 5
             timeoutSeconds: 2
           volumeMounts:
-            - name: pgdata2
+            - name: pgdata
               mountPath: /var/lib/postgresql/data
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
   volumeClaimTemplates:
     - metadata:
-        name: pgdata2
+        name: pgdata
         labels:
           app: postgres
       spec:
