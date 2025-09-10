@@ -18,9 +18,18 @@ data:
 
   01_create_messages.sql: |
     \connect mydb
+    -- Create/own table as app user to avoid permission issues
+    SET ROLE emine;
     CREATE TABLE IF NOT EXISTS messages(
       id SERIAL PRIMARY KEY,
       name TEXT NOT NULL,
       text TEXT NOT NULL,
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     );
+    RESET ROLE;
+
+    -- Ensure ownership and grants for existing clusters
+    ALTER TABLE IF EXISTS messages OWNER TO emine;
+    ALTER SEQUENCE IF EXISTS messages_id_seq OWNER TO emine;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE messages TO emine;
+    GRANT USAGE, SELECT, UPDATE ON SEQUENCE messages_id_seq TO emine;
